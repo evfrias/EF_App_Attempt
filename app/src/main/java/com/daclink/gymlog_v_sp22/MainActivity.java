@@ -19,7 +19,7 @@ import com.daclink.gymlog_v_sp22.db.GymLogDAO;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+//All fields have to be private
     private TextView mMainDisplay;
     private EditText mExercise;
     private EditText mWeight;
@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
     Button mSubmitButton;
 
     private List<GymLog> mGymLogs;
+
+    private int mUserId = -1;
+
     private void logoutUser() {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
 
@@ -51,6 +54,31 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+    private void clearUserFromPref() {
+        addUserToPreference(-1);
+    }
+
+    private GymLog getValuesFromDisplay() {
+        String exercise = "No record found";
+        double weight = 0.0;
+        int reps = 0;
+
+        exercise = mExercise.getText().toString();
+
+        try {
+            weight = Double.parseDouble(mWeight.getText().toString());
+        } catch (NumberFormatException e){
+            Log.d("GYMLOG", "Couldn't convert weight");
+        }
+
+        try {
+            reps = Integer.parseInt(mReps.getText().toString());
+        } catch (NumberFormatException e){
+            Log.d("GYMLOG", "Couldn't convert reps");
+        }
+
+        return new GymLog(exercise, reps, weight, mUserId);
+    }
 
     private void clearUserFromPref(){
         Toast.makeText(this, "clear useres not implemented", Toast.LENGTH_SHORT);
@@ -63,13 +91,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mMainDisplay = findViewById(R.id.mainGymLogDisplay);
+        mMainDisplay.setMovementMethod(new ScrollingMovementMethod());
+
         mExercise = findViewById(R.id.mainExerciseEditText);
         mWeight = findViewById(R.id.mainWeightEditText);
         mReps = findViewById(R.id.mainRepsEditText);
 
         mSubmitButton = findViewById(R.id.mainSubmitButton);
-        mMainDisplay.setMovementMethod(new ScrollingMovementMethod());
 
+        refreshDisplay();
 
         GymLogDAO mGymLogDAO = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME)
                 .allowMainThreadQueries()
