@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">GymLog V SP22</string>
+    <string name="app_name">JournalLog</string>
     <string name="mainExerciseHint">Enter Exercise</string>
     <string name="mainWeightHint">Enter Weight</string>
     <string name="mainRepsHint">Enter Reps</string>
     <string name="mainSubmitButton">Submit</string>
+    <string name="no_records_time_to_go_to_gym">noLogsMessage</string>
 </resources>
+
