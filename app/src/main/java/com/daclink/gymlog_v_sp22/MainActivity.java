@@ -1,8 +1,6 @@
 package com.daclink.gymlog_v_sp22;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -10,6 +8,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import com.daclink.gymlog_v_sp22.db.GymLogDAO;
 
@@ -25,9 +28,37 @@ public class MainActivity extends AppCompatActivity {
     Button mSubmitButton;
 
     private List<GymLog> mGymLogs;
+    private void logoutUser() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+
+        alertBuilder.setMessage(R.string.logout);
+
+        alertBuilder.setPositiveButton(getString(R.string.yes),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        clearUserFromIntent();
+                        clearUserFromPref();
+                        mUserId = -1;
+                        checkForUser();
+                    }
+                });
+        alertBuilder.setNegativeButton(getString(R.string.no),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //we don't really need to do anything here.
+                    }
+                });
+    }
+
+    private void clearUserFromPref(){
+        Toast.makeText(this, "clear useres not implemented", Toast.LENGTH_SHORT);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -73,17 +104,17 @@ public class MainActivity extends AppCompatActivity {
         } catch(NumberFormatException e)
         Log.d("GYMLOG","Couldn't convert reps")
 
-        GymLog log = new GymLog(exercise, reps, weight,);
+        GymLog log = new GymLog(exercise, reps, weight);
 
         return log;
 
     private void refreshDisplay{
-        GymLogDAO mGymLogDAO;
-        mGymLogs = mGymLogDAO.getGymLogs();
+        mGymLogs = mGymLogDAO.getGymLogsByUserId(mUserId);
 
         if (mGymLogs.size() >=0);
         {
             mMainDisplay.setText(R.string.no_records_time_to_go_to_gym);
+            return;
         }
 
         StringBuilder sb = new StringBuilder();

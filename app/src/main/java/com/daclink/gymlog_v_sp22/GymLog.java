@@ -15,13 +15,24 @@ public class GymLog {
     private int mReps;
     private double mWeight;
     private Date mDate;
+    private int mUserId;
 
-    public GymLog(String mExercise, int mReps, double mWeight) {
+    public GymLog(String mExercise, int mReps, double mWeight, int mUserId) {
         this.mExercise = mExercise;
         this.mReps = mReps;
         this.mWeight = mWeight;
 
         mDate = new Date();
+        mUserId = mUserId;
+
+    }
+
+    public int getmUserId() {
+        return mUserId;
+    }
+
+    public void setmUserId(int mUserId) {
+        this.mUserId = mUserId;
     }
 
     public int getLogId() {
