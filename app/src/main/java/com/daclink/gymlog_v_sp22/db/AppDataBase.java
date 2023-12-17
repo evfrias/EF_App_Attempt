@@ -15,5 +15,7 @@ public abstract class AppDataBase  extends RoomDatabase{
 
     public static final String USER_TABLE = "USER_TABLE";
 
+    public static final String ADMIN_TABLE = "ADMIN_TABLE";
+
     public abstract GymLogDAO getGymLogDAO();
 }

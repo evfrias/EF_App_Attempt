@@ -4,19 +4,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
+
 import com.daclink.gymlog_v_sp22.db.GymLogDAO;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     private User mUser;
 
     private SharedPreferences mPreferences = null;
+
+    private void getPrefs() {
+        mPreferences = this.getSharedPreferences(PREFENCES_KEY, Context.MODE_PRIVATE);
+    }
 
     private void logoutUser() {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
@@ -64,9 +73,11 @@ public class MainActivity extends AppCompatActivity {
     }
     private GymLog checkForUser() {
         mUserId = getIntent().getIntExtra(USER_ID_KEY, -1);
-
         if (mUserId != -1) {
             return;
+        }
+        if (mPreferences ==null){
+            getPreferences();
         }
         SharedPreferences preferences = this.getSharedPreferences(USER_ID_KEY, Context.MODE_PRIVATE);
         mUserId = mPreferences.getInt(USER_ID_KEY, -1);
@@ -82,12 +93,19 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = LoginActivity.intentFactory(this);
         startActivity(intent);
     }
+
     public  void getDataBase(){
         GymLogDAO mGymLogDAO = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME)
                 .allowMainThreadQueries()
                 .build()
                 .getGymLogDAO();
     }
+
+    public static Intent intentFactory(Context context, int userId) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(USER_ID_KEY, userId);
+
+        return intent;
 }
         private void addUserToPreference(int userId) {
             if(mPreferences == null) {
@@ -97,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
             editor.putInt(USER_ID_KEY, userId);
         }
 
+        private void clearUserFromIntent(){
+        getIntent().putExtra(USER_ID_KEY,-1);
+        }
     private void clearUserFromPref() {
         addUserToPreference(-1);
     }
@@ -126,9 +147,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getDataBase();
+        checkForUser();
+        addUserToPreference();
+        loginUser(mUserId);
+
         mMainDisplay = findViewById(R.id.mainGymLogDisplay);
         mMainDisplay.setMovementMethod(new ScrollingMovementMethod());
         mExercise = findViewById(R.id.mainExerciseEditText);
@@ -153,11 +179,6 @@ public class MainActivity extends AppCompatActivity {
                 refreshDisplay();
             }
         }
-
-            private void clearUserFromPref(){
-                Toast.makeText(this, "clear users not yet implemented", Toast.LENGTH_SHORT).show();
-            }
-
         private GymLog getValuesFromDisplay() {
                 String exercise = "No record found";
                 double weight = 0.0;
@@ -181,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                 return log;
             }
 
-    private void refreshDisplay {
+    private void refreshDisplay{
                 mGymLogs = mGymLogDAO.getGymLogsByUserId(mUserId);
 
                 if (mGymLogs.size() >= 0) ;
@@ -200,11 +221,22 @@ public class MainActivity extends AppCompatActivity {
         mMainDisplay.setText(sb.toString());
     }
 }
+
+    private void loginUser(int mUserId) {
+        private void loginUser(int userId) {
+            mUser = mGymLogDAO.getUserByUserId(userId);
+            invalidateOptionsMenu();
+        }
+    }
+
+
     @Override
-        public boolean onCreateOptionsMenu(Menu menu){
-            MenuInflater menuInflater = getMenuInflater();
-            menuInflater.inflate(R.menu.user_menu, menu);
-            return true;
+        public boolean onPrepareOptionsMenu(Menu menu){
+          if(mUser != null){
+            MenuItem item = (MenuItem) menu,findItem(R.id.userMenuLogout);
+            item.setTitle(mUser.getmUserName());
+          }
+          return super.onPrepareOptionsMenu();
         }
 
     @Override
@@ -217,8 +249,3 @@ public class MainActivity extends AppCompatActivity {
                return super.onOptionsItemSelected(item);
        }
     }
-        public static Intent intentFactory(Context context, int userId) {
-            Intent intent = new Intent(context, MainActivity.class);
-            intent.putExtra(USER_ID_KEY, userId);
-
-            return intent;

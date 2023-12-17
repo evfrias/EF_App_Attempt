@@ -88,6 +88,14 @@ public class LoginActivity extends AppCompatActivity {
                 .build()
                 .getGymLogDAO();
     }
+
+    public Object getDataBase() {
+        return dataBase;
+    }
+
+    public void setDataBase(Object dataBase) {
+        this.dataBase = dataBase;
+    }
 }
 
 
