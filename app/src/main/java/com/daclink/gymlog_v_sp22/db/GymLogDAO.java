@@ -7,6 +7,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.daclink.gymlog_v_sp22.GymLog;
+import com.daclink.gymlog_v_sp22.R;
 import com.daclink.gymlog_v_sp22.User;
 
 import java.util.List;
@@ -37,13 +38,16 @@ public interface GymLogDAO {
     @Query("SELECT * FROM" + AppDataBase.GYMLOG_TABLE + "WHERE mLogId = :logId")
     List<GymLog> getGymLogsById(int logId);
 
-    @Query("SELECT * FROM" + AppDataBase.GYMLOG_TABLE + "WHERE mLogId = :userId" ORDER BY mDate DESC )
+    @Query("SELECT * FROM" + AppDataBase.GYMLOG_TABLE + "WHERE mUserId = :userId ORDER BY mDate DESC" )
     List<GymLog> getGymLogsByUserId(int userId);
+
+    @Query("SELECT * FROM " + AppDatabase.USER_TABLE + .getString(R.string.where_musername_username))
+    User getUserByUsername(String username);
 
     @Query("SELECT * FROM" + AppDataBase.USER_TABLE)
     List<User> getAllUsers();
 
-    @Query("SELECT * FROM" + AppDataBase.USER_TABLE + "WHERE mUsername = :userId")
-     User getUserByUsername(String username);
+    @Query("SELECT * FROM" + AppDataBase.USER_TABLE + "WHERE mUserId = :userId")
+     User getUserByUserId(int userId);
 
 }

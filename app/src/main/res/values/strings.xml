@@ -5,5 +5,6 @@
     <string name="mainRepsHint">Enter Reps</string>
     <string name="mainSubmitButton">Submit</string>
     <string name="no_records_time_to_go_to_gym">noLogsMessage</string>
+    <string name="where_musername_username">WHERE mUserName =:username</string>
 </resources>
 

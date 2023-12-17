@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.daclink.gymlog_v_sp22.GymLog;
+import com.daclink.gymlog_v_sp22.User;
 import com.daclink.gymlog_v_sp22.db.typeConverters.DateTypeConverter;
 
 @Database(entities = {GymLog.class, User.class}, version = 2)

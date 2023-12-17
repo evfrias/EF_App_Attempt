@@ -10,4 +10,34 @@ public class User {
     private int mUserId;
     private String mUserName;
     private String mPassword;
+
+    public User(int mUserId, String mUserName, String mPassword) {
+        this.mUserId = mUserId;
+        this.mUserName = mUserName;
+        this.mPassword = mPassword;
+    }
+
+    public int getmUserId() {
+        return mUserId;
+    }
+
+    public void setmUserId(int mUserId) {
+        this.mUserId = mUserId;
+    }
+
+    public String getmUserName() {
+        return mUserName;
+    }
+
+    public void setmUserName(String mUserName) {
+        this.mUserName = mUserName;
+    }
+
+    public String getmPassword() {
+        return mPassword;
+    }
+
+    public void setmPassword(String mPassword) {
+        this.mPassword = mPassword;
+    }
 }

@@ -1,5 +1,7 @@
 package com.daclink.gymlog_v_sp22;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -44,3 +46,10 @@ public class LoginActivity extends AppCompatActivity {
                 .allowMainThreadQueries()
                 .build()
                 .getGymLogDAO();
+    }
+
+        public static Intent intentFactory(Context context) {
+            Intent intent = new Intent(context, LoginActivity.class);
+
+            return intent;
+        }

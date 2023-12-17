@@ -1,15 +1,21 @@
 package com.daclink.gymlog_v_sp22;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -19,7 +25,8 @@ import com.daclink.gymlog_v_sp22.db.GymLogDAO;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-//All fields have to be private
+    private static final String USER_ID_KEY = "com.daclink.gymlog_v_sp22.db.userIdKey";
+    //All fields have to be private
     private TextView mMainDisplay;
     private EditText mExercise;
     private EditText mWeight;
@@ -138,14 +145,14 @@ public class MainActivity extends AppCompatActivity {
 
         return log;
 
-    private void refreshDisplay{
-        mGymLogs = mGymLogDAO.getGymLogsByUserId(mUserId);
+    private void refreshDisplay {
+                mGymLogs = mGymLogDAO.getGymLogsByUserId(mUserId);
 
-        if (mGymLogs.size() >=0);
-        {
-            mMainDisplay.setText(R.string.no_records_time_to_go_to_gym);
-            return;
-        }
+                if (mGymLogs.size() >= 0) ;
+                {
+                    mMainDisplay.setText(R.string.no_records_time_to_go_to_gym);
+                    return;
+                }
 
         StringBuilder sb = new StringBuilder();
         for (GymLog log : mGymLogs) {
@@ -157,3 +164,25 @@ public class MainActivity extends AppCompatActivity {
         mMainDisplay.setText(sb.toString());
     }
 }
+    @Override
+        public boolean onCreateOptionsMenu(Menu menu){
+            MenuInflater menuInflater = getMenuInflater();
+            menuInflater.inflate(R.menu.user_menu, menu);
+            return true;
+        }
+
+    @Override
+       public boolean  onOptionsItemSelected(@NonNull MenuItem item){
+       switch (item.getItemId()) {
+           case R.id.userMenuLogout:
+               logoutUser();
+               return true;
+           default:
+               return super.onOptionsItemSelected(item);
+       }
+    }
+        public static Intent intentFactory(Context context, int userId) {
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.putExtra(USER_ID_KEY, userId);
+
+            return intent;
