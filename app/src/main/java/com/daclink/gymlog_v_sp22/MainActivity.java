@@ -3,29 +3,25 @@ package com.daclink.gymlog_v_sp22;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
+import android.content.SharedPreferences;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
-
 import com.daclink.gymlog_v_sp22.db.GymLogDAO;
-
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String USER_ID_KEY = "com.daclink.gymlog_v_sp22.db.userIdKey";
+    private static final String PREFENCES_KEY ="com.daclink.gymlog_v_sp22.db.PREFENCES KEY";
     //All fields have to be private
     private TextView mMainDisplay;
     private EditText mExercise;
@@ -34,9 +30,15 @@ public class MainActivity extends AppCompatActivity {
 
     Button mSubmitButton;
 
+    private GymLogDAO mGymLogDAO;
+
     private List<GymLog> mGymLogs;
 
     private int mUserId = -1;
+
+    private User mUser;
+
+    private SharedPreferences mPreferences = null;
 
     private void logoutUser() {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
@@ -57,10 +59,44 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //we don't really need to do anything here.
                     }
                 });
     }
+    private GymLog checkForUser() {
+        mUserId = getIntent().getIntExtra(USER_ID_KEY, -1);
+
+        if (mUserId != -1) {
+            return;
+        }
+        SharedPreferences preferences = this.getSharedPreferences(USER_ID_KEY, Context.MODE_PRIVATE);
+        mUserId = mPreferences.getInt(USER_ID_KEY, -1);
+
+        if (mUserId != -1) {
+            return;
+        }
+        List<User> users = mGymLogDAO.getAllUsers();
+        if (users.size() <= 0) {
+            User defaultUser = new User("EFF116", "EF117")
+            mGymLogDAO.insert(defaultUser);
+        }
+        Intent intent = LoginActivity.intentFactory(this);
+        startActivity(intent);
+    }
+    public  void getDataBase(){
+        GymLogDAO mGymLogDAO = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME)
+                .allowMainThreadQueries()
+                .build()
+                .getGymLogDAO();
+    }
+}
+        private void addUserToPreference(int userId) {
+            if(mPreferences == null) {
+                getPrefs();
+            }
+            SharedPreferences.Editor editor = mPreferences.edit();
+            editor.putInt(USER_ID_KEY, userId);
+        }
+
     private void clearUserFromPref() {
         addUserToPreference(-1);
     }
@@ -87,19 +123,14 @@ public class MainActivity extends AppCompatActivity {
         return new GymLog(exercise, reps, weight, mUserId);
     }
 
-    private void clearUserFromPref(){
-        Toast.makeText(this, "clear useres not implemented", Toast.LENGTH_SHORT);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mMainDisplay = findViewById(R.id.mainGymLogDisplay);
         mMainDisplay.setMovementMethod(new ScrollingMovementMethod());
-
         mExercise = findViewById(R.id.mainExerciseEditText);
         mWeight = findViewById(R.id.mainWeightEditText);
         mReps = findViewById(R.id.mainRepsEditText);
@@ -123,27 +154,32 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+            private void clearUserFromPref(){
+                Toast.makeText(this, "clear users not yet implemented", Toast.LENGTH_SHORT).show();
+            }
+
         private GymLog getValuesFromDisplay() {
-        String exercise = "No record found";
-        double weight = 0.0;
-        int reps = 0;
+                String exercise = "No record found";
+                double weight = 0.0;
+                int reps = 0;
 
-        exercise = mExercise.getText().toString();
+                exercise = mExercise.getText().toString();
 
-        try {
-            weight = Double.parseDouble(mWeight.getText().toString());
-        } catch (NumberFormatException e)
-        Log.d("GYMLOG", "Couldn't convert weight");
+                try {
+                    weight = Double.parseDouble(mWeight.getText().toString());
+                } catch (NumberFormatException e)
+                Log.d("GYMLOG", "Couldn't convert weight");
 
 
-        try{
-            reps = Integer.parseInt(mReps.getText().toString());
-        } catch(NumberFormatException e)
-        Log.d("GYMLOG","Couldn't convert reps")
+                try {
+                    reps = Integer.parseInt(mReps.getText().toString());
+                } catch (NumberFormatException e)
+                Log.d("GYMLOG", "Couldn't convert reps")
 
-        GymLog log = new GymLog(exercise, reps, weight);
+                GymLog log = new GymLog(exercise, reps, weight, mUserId);
 
-        return log;
+                return log;
+            }
 
     private void refreshDisplay {
                 mGymLogs = mGymLogDAO.getGymLogsByUserId(mUserId);

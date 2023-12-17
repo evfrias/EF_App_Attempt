@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -18,6 +19,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPassword;
     private Button mButton;
     private GymLogDAO mGymLogDAO;
+    private String mUsernameString;
+    private String mPasswordString;
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,22 +38,56 @@ public class LoginActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.editTextLoginPassword);
         mButton = findViewById(R.id.buttonLogin);
 
-        mButton.setOnLongClickListener(new View.OnLongClickListener() {
+        mButton.setOnLongClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View view) {
-                return false;
+            public void onClick() {
+                onClick(null);
+            }
+
+            @Override
+            public void onClick(View v) {
+                getValuesFromDisplay();
+                if (checkForUserInDatabase()) ;
+                if (!validatePassword()){
+                    Toast.makeText(LoginActivity.this,"Invalid Password", Toast.LENGTH_SHORT).show();
+
+                }else{
+                    Intent intent = MainActivity.intentFactory(getApplicationContext(),mUser.getmUserId());
+                    startActivity(intent);
+                }
             }
         });
     }
+
+    private boolean validatePassword(){
+       return mUser.getmPassword().equals(mPassword);
+    }
+    private void getValuesFromDisplay(){
+    mUsernameString = mUsername.getText().toString();
+    mPasswordString = mPassword.getText().toString();
+    }
+
+    private boolean checkForUserInDatabase(){
+        mUser = mGymLogDAO.getUserByUsername(mUsername);
+        if(mUser == null) {
+            Toast.makeText(this, "no user " + mUsername + " found", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    public static Intent intentFactory(Context context) {
+        Intent intent = new Intent(context, LoginActivity.class);
+
+        return intent;
+    }
+
     private void getDatabase() {
         mGymLogDAO = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME)
                 .allowMainThreadQueries()
                 .build()
                 .getGymLogDAO();
     }
+}
 
-        public static Intent intentFactory(Context context) {
-            Intent intent = new Intent(context, LoginActivity.class);
 
-            return intent;
-        }

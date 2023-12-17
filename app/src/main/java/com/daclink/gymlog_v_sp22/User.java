@@ -11,8 +11,7 @@ public class User {
     private String mUserName;
     private String mPassword;
 
-    public User(int mUserId, String mUserName, String mPassword) {
-        this.mUserId = mUserId;
+    public User(String mUserName, String mPassword) {
         this.mUserName = mUserName;
         this.mPassword = mPassword;
     }
