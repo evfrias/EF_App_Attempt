@@ -6,5 +6,8 @@
     <string name="mainSubmitButton">Submit</string>
     <string name="no_records_time_to_go_to_gym">noLogsMessage</string>
     <string name="where_musername_username">WHERE mUserName =:username</string>
+    <string name="logout" />
+    <string name="yes" />
+    <string name="no" />
 </resources>
 

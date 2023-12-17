@@ -82,7 +82,8 @@ public class GymLog {
         output += "\n";
         output += mWeight + ":" + mReps;
         output += getDate();
+        output += "userId == " + mUserId;
 
         return output;
     }
-}
+
